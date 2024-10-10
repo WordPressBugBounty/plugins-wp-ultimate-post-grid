@@ -11,7 +11,25 @@ window.WPUPG_Pagination_pages = {
             id,
             elem,
             page: 0,
-            pagesLoaded: [0],
+            pagesLoaded: {},
+            checkPageLoaded( page ) {
+                const orderKey = WPUPG_Grids[ pagination.gridElemId ].getOrderKey();
+
+                if ( this.pagesLoaded.hasOwnProperty( orderKey ) ) {
+                    return this.pagesLoaded[ orderKey ].includes( page );
+                }
+
+                return false;
+            },
+            setPageLoaded( page ) {
+                const orderKey = WPUPG_Grids[ pagination.gridElemId ].getOrderKey();
+
+                if ( ! this.pagesLoaded.hasOwnProperty( orderKey ) ) {
+                    this.pagesLoaded[ orderKey ] = [];
+                }
+
+                this.pagesLoaded[ orderKey ].push( page );
+            },
             totalPages: false,
             getDeeplink() {
                 return this.page ? `p:${ this.page }` : '';
@@ -76,7 +94,7 @@ window.WPUPG_Pagination_pages = {
             changePage( button, callback = false ) {
                 const page = parseInt( button.dataset.page );
 
-                if ( this.pagesLoaded.includes( page ) || ( this.args.adaptive_pages && '.wpupg-item' !== this.currentFilterString ) ) {
+                if ( this.checkPageLoaded( page ) || ( this.args.adaptive_pages && '.wpupg-item' !== this.currentFilterString ) ) {
                     callback( page );
                     this.contractPages();
                 } else {
@@ -93,8 +111,8 @@ window.WPUPG_Pagination_pages = {
                     }, () => {
                         button.classList.remove( 'wpupg-spinner' );
                         button.style.color = '';
-
-                        this.pagesLoaded.push( page );
+                        
+                        this.setPageLoaded( page );
 
                         if ( '.wpupg-item' === this.currentFilterString ) {
                             this.adaptPageClasses(); // Need to update page classes if new items have been loaded. Do before callback, where the grid gets filtered.
@@ -183,7 +201,7 @@ window.WPUPG_Pagination_pages = {
                             itemsInPage = 0;
 
                             if ( '.wpupg-item' === this.currentFilterString ) {
-                                while ( page <= totalPages && ! this.pagesLoaded.includes( page ) ) {
+                                while ( page <= totalPages && ! this.checkPageLoaded( page ) ) {
                                     page++;
                                 }
                             }
@@ -305,10 +323,35 @@ window.WPUPG_Pagination_pages = {
                 }
             },
             init() {
+                // Set first page loaded for default order.
+                this.setPageLoaded( 0 );
+
                 if ( this.buttons && 0 < this.buttons.length ) {
                     this.contractPages();
+
                     WPUPG_Grids[ pagination.gridElemId ].on( 'filter', () => {
                         this.adaptPages();
+                    });
+
+                    WPUPG_Grids[ pagination.gridElemId ].on( 'sort', () => {
+                        if ( this.args.adaptive_pages ) {
+                            // Load at least 1 page of items.
+                            WPUPG_Grids[ this.gridElemId ].loadItems(
+                                {
+                                    page: 0,
+                                }, () => {
+                                    this.setPageLoaded( 0 );
+
+                                    this.currentFilterString = 'force';
+                                    this.adaptPages();
+
+                                    // Force a first button click.
+                                    const firstButton = this.buttons[0];
+                                    firstButton.classList.remove( 'active' );
+                                    this.onClickButton( firstButton );
+                                }
+                            );
+                        }
                     });
                 }
             },

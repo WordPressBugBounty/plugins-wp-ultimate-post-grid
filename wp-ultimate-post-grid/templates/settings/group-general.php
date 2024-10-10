@@ -25,6 +25,17 @@ $group_general = array(
 					'optionsCallback' => function() { return get_taxonomies( '', 'names' ); },
 					'default' => array( 'category', 'post_tag' ),
 				),
+				array(
+					'id' => 'default_custom_link_nofollow',
+					'name' => __( 'Default Nofollow Attribute', 'wp-ultimate-post-grid' ),
+					'description' => __( 'Default for the nofollow attribute for custom links.', 'wp-ultimate-post-grid' ),
+					'type' => 'dropdown',
+					'options' => array(
+						'dofollow' => __( 'Use a regular dofollow link', 'wp-ultimate-post-grid' ),
+						'nofollow' => __( 'Add the rel="nofollow" attribute', 'wp-ultimate-post-grid' ),
+					),
+					'default' => 'dofollow',
+				),
 			),
 		),
 		array(

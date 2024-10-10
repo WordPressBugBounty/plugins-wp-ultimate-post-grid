@@ -80,6 +80,7 @@ class WPUPG_Grid_Saver {
 			'filters',
 			'filters_style',
 			'filters_relation',
+			'filters_no_selection',
 			'responsive_toggle_style',
 			'responsive_toggle_style_closed',
 			'responsive_toggle_style_open',
@@ -115,6 +116,7 @@ class WPUPG_Grid_Saver {
 			'metadata_name',
 			'metadata_description',
 			'deeplinking',
+			'deeplinking_jump',
 			'empty_message',
 		);
 

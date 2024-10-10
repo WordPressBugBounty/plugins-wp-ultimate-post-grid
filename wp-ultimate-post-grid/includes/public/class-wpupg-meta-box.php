@@ -42,6 +42,7 @@ class WPUPG_Meta_Box {
 		$fields = array(
 			'wpupg_custom_link' => 'string',
 			'wpupg_custom_link_behaviour' => 'string',
+			'wpupg_custom_link_nofollow' => 'string',
 			'wpupg_custom_image' => 'string',
 			'wpupg_custom_image_id' => 'integer',
 		);
@@ -114,6 +115,7 @@ class WPUPG_Meta_Box {
             $fields = array(
                 'wpupg_custom_link',
                 'wpupg_custom_link_behaviour',
+                'wpupg_custom_link_nofollow',
                 'wpupg_custom_image',
                 'wpupg_custom_image_id',
             );

@@ -31,7 +31,7 @@ class WP_Ultimate_Post_Grid {
 	 * @since    3.0.0
 	 */
 	private function define_constants() {
-		define( 'WPUPG_VERSION', '3.9.3' );
+		define( 'WPUPG_VERSION', '4.0.0' );
 		define( 'WPUPG_PREMIUM_VERSION_REQUIRED', '3.0.0' );
 		define( 'WPUPG_POST_TYPE', 'wpupg_grid' );
 		define( 'WPUPG_DIR', plugin_dir_path( dirname( __FILE__ ) ) );

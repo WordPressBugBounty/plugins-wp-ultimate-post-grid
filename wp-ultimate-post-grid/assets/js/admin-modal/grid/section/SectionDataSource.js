@@ -188,20 +188,24 @@ const SectionDataSource = (props) => {
                             />
                         </Fragment>
                     }
-                    <Field
-                        value={ props.grid.order }
-                        onChange={ ( value ) => {
-                            props.onGridChange({
-                                order: value,
-                            });
-                        }}
-                        type="dropdown"
-                        options={[
-                            { value: 'asc', label: __wpupg( 'Ascending' ) },
-                            { value: 'desc', label: __wpupg( 'Descending' ) },
-                        ]}
-                        label={ __wpupg( 'Order' ) }
-                    />
+                    {
+                        'rand' !== props.grid.order_by
+                        &&
+                        <Field
+                            value={ props.grid.order }
+                            onChange={ ( value ) => {
+                                props.onGridChange({
+                                    order: value,
+                                });
+                            }}
+                            type="dropdown"
+                            options={[
+                                { value: 'asc', label: __wpupg( 'Ascending' ) },
+                                { value: 'desc', label: __wpupg( 'Descending' ) },
+                            ]}
+                            label={ __wpupg( 'Order' ) }
+                        />
+                    }
                 </Fragment>
             }
             {

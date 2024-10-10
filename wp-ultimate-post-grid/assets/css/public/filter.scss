@@ -41,6 +41,25 @@
     }
 }
 
+.wpupg-filter-item-icon-container {
+    display: flex;
+    align-items: center;
+
+    .wpupg-filter-item-icon {
+        margin-right: 5px;
+        
+        svg {
+            vertical-align: text-top;
+            margin-top: 0.1em;
+        }
+    }
+
+    .wpupg-filter-item-icon-text + .wpupg-filter-item-icon {
+        margin-left: 8px;
+        margin-right: 0;
+    }
+}
+
 .wp-admin .block-editor .wpupg-filter-container {
     visibility: visible;
 }

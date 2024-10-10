@@ -37,7 +37,7 @@ class WPUPG_Order {
 	 * @param	 mixed $grid Grid to output.
 	 */
 	public static function javascript_args( $args, $grid ) {
-		$parsing = self::get_order_parsing( $grid );
+		$parsing = self::get_order_parsing( $grid->grid_order_by(), $grid->order_custom_key_numeric() );
 
 		$args['isotope']['getSortData'] = array(
 			'default' => '[data-order-default]' . $parsing,
@@ -55,7 +55,7 @@ class WPUPG_Order {
 	 */
 	public static function item_data( $data, $grid, $item, $args ) {
 		if ( $grid ) {
-			$order_key = self::get_order_key( $grid, $item );
+			$order_key = self::get_order_key_for( $item, $grid->grid_order_by(), $grid->order_custom_key() );
 
 			if ( false !== $order_key ) {
 				$data[ 'order-default' ] = $order_key;
@@ -70,10 +70,10 @@ class WPUPG_Order {
 	 *
 	 * @since    3.9.0
 	 */
-	public static function get_order_key( $grid, $item ) {
+	public static function get_order_key_for( $item, $order_by, $order_by_custom_key = false ) {
 		$order_key = false;
 
-		switch( $grid->grid_order_by() ) {
+		switch( $order_by ) {
 			case 'title':
 			case 'name':
 				$order_key = $item->title();
@@ -103,13 +103,15 @@ class WPUPG_Order {
 				$order_key = $item->count();
 				break;
 			case 'rand':
+				$order_key = rand();
 				break;
 			case 'menu_order':
 				$order_key = $item->menu_order();
 				break;
 			case 'custom':
-				$meta_key = $grid->order_custom_key();
-				$order_key = $item->meta( $meta_key );
+				if ( $order_by_custom_key ) {
+					$order_key = $item->meta( $order_by_custom_key );
+				}
 				break;
 		}
 
@@ -121,10 +123,10 @@ class WPUPG_Order {
 	 *
 	 * @since    3.9.0
 	 */
-	public static function get_order_parsing( $grid ) {
+	public static function get_order_parsing( $order_by, $custom_key_numeric = false ) {
 		$parsing = '';
 
-		switch( $grid->grid_order_by() ) {
+		switch( $order_by ) {
 			case 'date':
 			case 'modified':
 			case 'comment_count':
@@ -138,7 +140,7 @@ class WPUPG_Order {
 				$parsing = 'parseFloat';
 				break;
 			case 'custom':
-				if ( $grid->order_custom_key_numeric() ) {
+				if ( $custom_key_numeric ) {
 					$parsing = 'parseFloat';
 				}
 				break;

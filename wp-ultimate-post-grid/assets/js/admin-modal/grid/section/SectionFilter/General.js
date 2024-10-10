@@ -139,6 +139,26 @@ const General = (props) => {
                                     label={ __wpupg( 'Filters Relation' ) }
                                 />
                             }
+                            <Field
+                                value={ props.grid.filters_no_selection }
+                                onChange={ ( value ) => { props.onGridChange({ filters_no_selection: value }); }}
+                                type="dropdown"
+                                options={[
+                                    {
+                                        value: 'all',
+                                        label: __wpupg( 'Show all grid items, according to pagination' ),
+                                    },
+                                    {
+                                        value: 'empty',
+                                        label: __wpupg( 'Do not show any grid items' ),
+                                    },
+                                    {
+                                        value: 'empty_on_load',
+                                        label: __wpupg( 'Does not show any grid items on first load, but displays all items afterwards' ),
+                                    }
+                                ]}
+                                label={ __wpupg( 'When No Filters are Selected' ) }
+                            />
                         </Fragment> 
                     }
                 </Fragment>

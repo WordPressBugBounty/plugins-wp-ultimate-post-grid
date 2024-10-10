@@ -48,17 +48,34 @@ const SectionOther = (props) => {
             {
                 'posts' === props.grid.type
                 &&
-                <Field
-                    value={ props.grid.deeplinking }
-                    onChange={ ( value ) => {
-                        props.onGridChange({
-                            deeplinking: value,
-                        });
-                    }}
-                    type="checkbox"
-                    label={ __wpupg( 'Enable deeplinking' ) }
-                    help={ __wpupg( 'When deeplinking is enabled the URL will automatically get updated to reflect the position in the grid. Visitors will be able to copy that link to go back to it.' ) }
-                />
+                <Fragment>
+                    <Field
+                        value={ props.grid.deeplinking }
+                        onChange={ ( value ) => {
+                            props.onGridChange({
+                                deeplinking: value,
+                            });
+                        }}
+                        type="checkbox"
+                        label={ __wpupg( 'Enable deeplinking' ) }
+                        help={ __wpupg( 'When deeplinking is enabled the URL will automatically get updated to reflect the position in the grid. Visitors will be able to copy that link to go back to it.' ) }
+                    />
+                    {
+                        props.grid.deeplinking
+                        &&
+                        <Field
+                            value={ props.grid.deeplinking_jump }
+                            onChange={ ( value ) => {
+                                props.onGridChange({
+                                    deeplinking_jump: value,
+                                });
+                            }}
+                            type="checkbox"
+                            label={ __wpupg( 'Deeplink Jump' ) }
+                            help={ __wpupg( 'If someone follows a deeplink, jump down to the grid as well.' ) }
+                        />
+                    }
+                </Fragment>
             }
             <Field
                 value={ props.grid.empty_message }

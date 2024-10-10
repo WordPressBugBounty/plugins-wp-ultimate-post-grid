@@ -46,6 +46,7 @@ class WPUPG_Grid_Sanitizer {
 		if ( isset( $grid['layout_tablet_different'] ) ) 				{ $sanitized_grid['layout_tablet_different'] = $grid['layout_tablet_different'] ? true : false; }
 		if ( isset( $grid['link'] ) ) 									{ $sanitized_grid['link'] = $grid['link'] ? true : false; }
 		if ( isset( $grid['deeplinking'] ) ) 							{ $sanitized_grid['deeplinking'] = $grid['deeplinking'] ? true : false; }
+		if ( isset( $grid['deeplinking_jump'] ) ) 						{ $sanitized_grid['deeplinking_jump'] = $grid['deeplinking_jump'] ? true : false; }
 		if ( isset( $grid['metadata'] ) ) 								{ $sanitized_grid['metadata'] = $grid['metadata'] ? true : false; }
 
 		// Number fields.
@@ -124,6 +125,11 @@ class WPUPG_Grid_Sanitizer {
 		$options = array( 'AND', 'OR' );
 		if ( isset( $grid['filters_relation'] ) && in_array( $grid['filters_relation'], $options, true ) ) {
 			$sanitized_grid['filters_relation'] = $grid['filters_relation'];
+		}
+
+		$options = array( 'all', 'empty', 'empty_on_load' );
+		if ( isset( $grid['filters_no_selection'] ) && in_array( $grid['filters_no_selection'], $options, true ) ) {
+			$sanitized_grid['filters_no_selection'] = $grid['filters_no_selection'];
 		}
 
 		$options = array( 'arrow', 'triangle', 'plus', 'custom' );

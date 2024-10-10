@@ -128,6 +128,7 @@ class WPUPG_Grid {
 		$grid['filters_enabled'] = $this->filters_enabled();
 		$grid['filters_style'] = $this->filters_style();		
 		$grid['filters_relation'] = $this->filters_relation();
+		$grid['filters_no_selection'] = $this->filters_no_selection();
 		$grid['responsive_toggle_style'] = $this->responsive_toggle_style();
 		$grid['responsive_toggle_style_closed'] = $this->responsive_toggle_style_closed();
 		$grid['responsive_toggle_style_open'] = $this->responsive_toggle_style_open();
@@ -167,6 +168,7 @@ class WPUPG_Grid {
 		$grid['metadata_name'] = $this->metadata_name();
 		$grid['metadata_description'] = $this->metadata_description();
 		$grid['deeplinking'] = $this->deeplinking();
+		$grid['deeplinking_jump'] = $this->deeplinking_jump();
 		$grid['empty_message'] = $this->empty_message();
 
 		return $grid;
@@ -204,6 +206,7 @@ class WPUPG_Grid {
 		);
 		$args['link'] = $this->link() ? $this->link_target() : false;
 		$args['deeplinking'] = $this->deeplinking();
+		$args['deeplinking_jump'] = $this->deeplinking_jump();
 
 		// Arguments for Isotope JS.
 		$args['isotope'] = array(
@@ -235,6 +238,7 @@ class WPUPG_Grid {
 
 		// Arguments for filters.
 		$args['filters_relation'] = $this->filters_relation();
+		$args['filters_no_selection'] = $this->filters_no_selection();
 		$args['filters'] = array();
 		if ( $this->filters_enabled() ) {
 			$filters = $this->filters();
@@ -297,24 +301,29 @@ class WPUPG_Grid {
 	 * @param	 mixed $default	Default to return if metadata is not set.
 	 */
 	public function meta( $field, $default = '' ) {
+		$value = $default;
+
 		if ( false === $this->post ) {
 			if ( isset( $this->meta[ $field ] ) ) {
-				return $this->meta[ $field ];
+				$value = $this->meta[ $field ];
 			}
 		} else {
 			// Use prefix when stored in actual meta.
-			$field = 'wpupg_' . $field;
+			$stored_field = 'wpupg_' . $field;
 
 			if ( ! $this->meta ) {
 				$this->meta = get_post_custom( $this->id() );
 			}
 	
-			if ( isset( $this->meta[ $field ] ) && null !== $this->meta[ $field ][0] ) {
-				return $this->meta[ $field ][0];
+			if ( isset( $this->meta[ $stored_field ] ) && null !== $this->meta[ $stored_field ][0] ) {
+				$value = $this->meta[ $stored_field ][0];
 			}
 		}
 
-		return $default;
+		// Allow filtering of the value.
+		$value = apply_filters( 'wpupg_grid_meta_field_' . sanitize_key( $field ), $value, $this );
+
+		return $value;
 	}
 
 	/**
@@ -410,7 +419,14 @@ class WPUPG_Grid {
 		return $this->meta( 'order_by', 'date' );
 	}
 	public function order() {
-		return $this->meta( 'order', 'desc' );
+		$order = $this->meta( 'order', 'desc' );
+
+		if ( 'rand' === $this->order_by() ) {
+			// Adaptive pages break if order is not set to ASC when order_by is set to random.
+			$order = 'asc';
+		}
+
+		return $order;
 	}
 	public function order_custom_key() {
 		return $this->meta( 'order_custom_key', '' );
@@ -544,6 +560,9 @@ class WPUPG_Grid {
 	}
 	public function filters_relation() {
 		return $this->meta( 'filters_relation', 'AND' );
+	}
+	public function filters_no_selection() {
+		return $this->meta( 'filters_no_selection', 'all' );
 	}
 	public function responsive_toggle_style() {
 		return $this->meta( 'responsive_toggle_style', 'custom' );
@@ -711,6 +730,10 @@ class WPUPG_Grid {
 	}
 	public function deeplinking() {
 		$bool = $this->meta( 'deeplinking', true );
+		return (bool) $bool;
+	}
+	public function deeplinking_jump() {
+		$bool = $this->meta( 'deeplinking_jump', false );
 		return (bool) $bool;
 	}
 	public function empty_message() {

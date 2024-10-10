@@ -8,18 +8,23 @@ export default {
         if ( body.hasOwnProperty( 'args' ) && body.args.hasOwnProperty( 'wpes' ) && 0 < body.args.wpes ) {
             loadEndpoint += `?wpessid=${ body.args.wpes }`;
         }
+        
+        let headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            // Don't cache API calls.
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': 0,
+        };
+
+        if ( 0 < parseInt( wpupg_public.user ) ) {
+            headers['X-WP-Nonce'] = wpupg_public.api_nonce;
+        }
 
         const args = {
             method: 'POST',
-            headers: {
-                'X-WP-Nonce': wpupg_public.api_nonce,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                // Don't cache API calls.
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': 0,
-            },
+            headers,
             credentials: 'same-origin',
             body: JSON.stringify( body ),
         };

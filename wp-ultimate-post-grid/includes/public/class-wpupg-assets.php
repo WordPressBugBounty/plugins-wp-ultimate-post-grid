@@ -53,6 +53,7 @@ class WPUPG_Assets {
 		wp_register_script( 'wpupg-public', WPUPG_URL . 'dist/public.js', $dependencies, WPUPG_VERSION, true );
 
 		wp_localize_script( 'wpupg-public', 'wpupg_public', array(
+			'user' => get_current_user_id(),
 			'api_nonce' => wp_create_nonce( 'wp_rest' ),
 			'api_endpoint' => get_rest_url( null, 'wp-ultimate-post-grid/v1/items' ),
 			'debugging' => WPUPG_Settings::get( 'enable_debug_messages' ),

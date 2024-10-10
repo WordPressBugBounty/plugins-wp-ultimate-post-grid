@@ -209,6 +209,34 @@
             }
         }
     }
+
+    .wpupg-admin-modal-field-icon {
+        cursor: pointer;
+
+        &.wpupg-admin-modal-field-icon-none {
+            opacity: 0.3;
+        }
+    }
+}
+
+// Part of tooltip, so not inside of wpupg-admin-modal.
+.wpupg-admin-modal-field-icons-container {
+    text-align: center;
+
+    .wpupg-admin-modal-field-icons {
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 156px;
+    
+        .wpupg-admin-modal-field-icons-icon {
+            margin: 5px;
+            cursor: pointer;
+        }
+    }
+
+    a {
+        font-size: 0.8em;
+    }
 }
 
 @media screen and (min-width: 782px) {

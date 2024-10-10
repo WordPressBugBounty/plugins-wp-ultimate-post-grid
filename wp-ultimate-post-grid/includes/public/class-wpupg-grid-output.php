@@ -68,7 +68,7 @@ class WPUPG_Grid_Output {
 			$output .= '</style>';
 		}
 
-		$output .= '<div id="wpupg-grid-with-filters-' . $grid->slug_or_id() . '" class="' . implode( ' ', $classes ). '">';
+		$output .= '<div id="wpupg-grid-with-filters-' . esc_attr( $grid->slug_or_id() ) . '" class="' . esc_attr( implode( ' ', $classes ) ) . '">';
 
 		$output .= self::filters( $grid, $args );
 		$output .= self::grid( $grid, $args );
@@ -106,7 +106,7 @@ class WPUPG_Grid_Output {
 				$output .= '</style>';
 			}
 
-			$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '-filters" class="' . implode( ' ', $classes ). '">';
+			$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '-filters" class="' . esc_attr( implode( ' ', $classes ) ) . '">';
 
 			foreach ( $filters as $index => $filter ) {
 				// Make sure filter ID is set.
@@ -161,7 +161,7 @@ class WPUPG_Grid_Output {
 				}
 			}
 
-			$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '-filter-' . $filter['id'] . '-container" class="' . implode( ' ', $container_classes ) .'">';
+			$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '-filter-' . $filter['id'] . '-container" class="' . esc_attr( implode( ' ', $container_classes ) ) .'">';
 
 			// Optional label output.
 			if ( ( isset( $filter['label'] ) && $filter['label'] ) || $using_toggle ) {
@@ -171,7 +171,7 @@ class WPUPG_Grid_Output {
 					'wpupg-filter-label-align-' . $grid->filters_style( 'label_alignment' ),
 				);
 
-				$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '-filter-' . $filter['id'] . '-label" class="' . implode( ' ', $label_classes ) .'">';
+				$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '-filter-' . $filter['id'] . '-label" class="' . esc_attr( implode( ' ', $label_classes ) ) .'">';
 
 				if ( $using_toggle ) {
 					$output .= '<span class="wpupg-filter-toggle-container">';
@@ -231,10 +231,14 @@ class WPUPG_Grid_Output {
 			// Filter output.
 			$filter_classes = array(
 				'wpupg-filter',
-				'wpupg-filter-' . $filter['type'],
+				'wpupg-filter-' . esc_attr( $filter['type'] ),
 			);
 
-			$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '-filter-' . $filter['id'] . '" class="' . implode( ' ', $filter_classes ) .'">';
+			if ( 'dynamic_order' === $filter['type'] ) {
+				$filter_classes[] = 'wpupg-filter-dynamic-order-' . $filter['options']['display'];
+			}
+
+			$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '-filter-' . $filter['id'] . '" class="' . esc_attr( implode( ' ', $filter_classes ) ) .'">';
 			$output .= $filter_output;
 			$output .= '</div>';
 
@@ -263,7 +267,7 @@ class WPUPG_Grid_Output {
 			$classes[] = 'align' . $args['align'];
 		}
 
-		$output = '<div id="wpupg-grid-container-' . $grid->slug_or_id() . '" class="' . implode( ' ', $classes ) . '">';
+		$output = '<div id="wpupg-grid-container-' . $grid->slug_or_id() . '" class="' . esc_attr( implode( ' ', $classes ) ) . '">';
 
 		// Add styling.
 		$is_preview = isset( $args['preview'] ) && $args['preview'];
@@ -285,17 +289,17 @@ class WPUPG_Grid_Output {
 		}
 
 		$items = self::items( $grid, $args );
-		$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '" class="wpupg-grid wpupg-grid-loading" data-grid-id="' . $grid->id() . '">' . $items['html'] . '</div>';
+		$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '" class="wpupg-grid wpupg-grid-loading" data-grid-id="' . $grid->id() . '">' . $items['html'] . '</div>';
 
 		// Optional empty message.
 		if ( $grid->empty_message() ) {
-			$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '-empty" class="wpupg-grid-empty">' . $grid->empty_message() . '</div>';
+			$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '-empty" class="wpupg-grid-empty">' . $grid->empty_message() . '</div>';
 		}
 
 		// Output pagination.
 		$pagination_output = apply_filters( 'wpupg_output_pagination', '', $grid, $args );
 		if ( $pagination_output ) {
-			$output .= '<div id="wpupg-grid-' . $grid->slug_or_id() . '-pagination" class="wpupg-pagination wpupg-pagination-' . $grid->pagination_type() . '">';
+			$output .= '<div id="wpupg-grid-' . esc_attr( $grid->slug_or_id() ) . '-pagination" class="wpupg-pagination wpupg-pagination-' . esc_attr( $grid->pagination_type() ) . '">';
 			$output .= $pagination_output;
 			$output .= '</div>';
 		}
@@ -467,7 +471,7 @@ class WPUPG_Grid_Output {
 			// Don't actually add link when previewing.
 			if ( isset( $args['preview'] ) && $args['preview'] && $item->link( $grid ) ) {
 				return array(
-					'output' => '<div class="' . implode( ' ', $classes ) . '" style="cursor: pointer;"' . $data_string .'>' . $html . '</div>',
+					'output' => '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" style="cursor: pointer;"' . $data_string .'>' . $html . '</div>',
 					'metadata' => false,
 				);
 			}
@@ -481,17 +485,24 @@ class WPUPG_Grid_Output {
 
 			if ( $link ) {
 				$classes[] = 'wpupg-item-link';
-				$rel = 'image' === $grid->link_type() ? ' rel="lightbox"' : '';
+				
+				// Optional rel attribute.
+				$rel = '';
+				if ( 'image' === $grid->link_type() ) {
+					$rel = ' rel="lightbox"';
+				} elseif( 'nofollow' === $item->link_nofollow() ) {
+					$rel = ' rel="nofollow"';
+				}
 
 				// Strip any other links in HTML.
 				$html = str_ireplace( '<a ', '<span ', $html );
 				$html = str_ireplace( '<a', '<span', $html );
 				$html = str_ireplace( '</a>', '</span>', $html );
 
-				$output = '<a class="' . implode( ' ', $classes ) . '" href="' . esc_attr( $link ) . '" target="' . esc_attr( $item->link_target( $grid ) ) . '"' . $rel . '' . $data_string .'>' . $html . '</a>';
+				$output = '<a class="' . esc_attr( implode( ' ', $classes ) ) . '" href="' . esc_attr( $link ) . '" target="' . esc_attr( $item->link_target( $grid ) ) . '"' . $rel . '' . $data_string .'>' . $html . '</a>';
 				$url = $link;
 			} else {
-				$output = '<div class="' . implode( ' ', $classes ) . '"' . $data_string .'>' . $html . '</div>';
+				$output = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '"' . $data_string .'>' . $html . '</div>';
 			}
 		}
 

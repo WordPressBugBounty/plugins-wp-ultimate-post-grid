@@ -218,4 +218,20 @@ class WPUPG_Item {
 			return $custom_link_target;
 		}
 	}
+	public function link_nofollow() {
+		$custom_url = $this->meta( 'wpupg_custom_link', false );
+
+		if ( $custom_url ) {
+			$custom_link_nofollow = $this->meta( 'wpupg_custom_link_nofollow', 'default' );
+
+			if ( 'default' === $custom_link_nofollow ) {
+				return WPUPG_Settings::get( 'default_custom_link_nofollow' );
+			} else {
+				return $custom_link_nofollow;
+			}
+		}
+
+		// Only nofollow for custom links.
+		return 'dofollow';
+	}
 }

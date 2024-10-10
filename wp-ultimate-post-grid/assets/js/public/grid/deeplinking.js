@@ -15,6 +15,8 @@ export default ( elemId, args ) => {
                         deeplink.push( this.pagination.getDeeplink() );
                     }
                 }
+
+                deeplink.push( this.getOrderDeeplink() );
             }
 
             return deeplink.filter( ( l ) => l ).join( '+' );
@@ -35,6 +37,7 @@ export default ( elemId, args ) => {
 
             replaceDeeplink( deeplink );
         },
+        jumpToGrid: false,
         restoreDeeplink() {
             let link = document.location.hash;
             link = link.substr(1);
@@ -52,9 +55,14 @@ export default ( elemId, args ) => {
         
                 const grids = link.split('#');
         
-                for ( let grid of grids ) {
+                for ( let i = 0; i < grids.length; i++ ) {
+                    const grid = grids[i];
                     const parts = grid.split( '+' );
                     const gridSlug = parts.shift();
+
+                    if ( 0 === i ) {
+                        this.jumpToGrid = gridSlug;
+                    }
 
                     // Let each grid handle its own restore.
                     if ( gridSlug === this.gridSlug ) {
@@ -105,6 +113,30 @@ export default ( elemId, args ) => {
                 type: 'count',
             });
 
+            // Maybe jump to grid.
+            if ( args.hasOwnProperty( 'deeplinking_jump' ) && args.deeplinking_jump ) {
+                if ( this.jumpToGrid && this.jumpToGrid === this.gridSlug ) {
+                    // Try to jump to full grid first.
+                    const elementsToJumpTo = [
+                        `wpupg-grid-with-filters-${ this.gridSlug }`,
+                        `wpupg-grid-${ this.gridSlug }-filters`,
+                        `wpupg-grid-container-${ this.gridSlug }`,
+                    ];
+
+                    for ( let element of elementsToJumpTo ) {
+                        const elem = document.getElementById( element );
+
+                        if ( elem ) {
+                            elem.scrollIntoView({
+                                behavior: 'smooth',
+                            });
+
+                            break;
+                        }
+                    }
+                }
+            }
+
             this.fireEvent( 'restoredDeeplink', true );
         },
         initDeeplinking() {
@@ -114,6 +146,10 @@ export default ( elemId, args ) => {
                 });
 
                 this.on( 'filter', () => {
+                    this.updateDeeplink();
+                });
+
+                this.on( 'sort', () => {
                     this.updateDeeplink();
                 });
             }

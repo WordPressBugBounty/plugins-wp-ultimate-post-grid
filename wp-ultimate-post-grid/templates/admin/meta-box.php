@@ -19,7 +19,7 @@
         <td><?php _e( 'Override the default link for this post.', 'wp-ultimate-post-grid' ); ?></td>
     </tr>
     <tr>
-        <td><label for="wpugpg_"><?php _e( 'Custom Link Behaviour', 'wp-ultimate-post-grid' ); ?></label></td>
+        <td><label for="wpupg_custom_link_behaviour"><?php _e( 'Custom Link Behaviour', 'wp-ultimate-post-grid' ); ?></label></td>
         <td>
             <select name="wpupg_custom_link_behaviour" id="wpupg_custom_link_behaviour">
                 <?php
@@ -38,6 +38,26 @@
             </select>
         </td>
         <td><?php _e( 'Override the link behaviour for this item.', 'wp-ultimate-post-grid' ); ?></td>
+    </tr>
+    <tr>
+        <td><label for="wpupg_custom_link_nofollow"><?php _e( 'Custom Link Nofollow', 'wp-ultimate-post-grid' ); ?></label></td>
+        <td>
+            <select name="wpupg_custom_link_nofollow" id="wpupg_custom_link_nofollow">
+                <?php
+                $custom_link_nofollow_options = array(
+                    'default' => __( 'Use default from settings', 'wp-ultimate-post-grid' ),
+                    'dofollow' => __( 'Use a regular dofollow link', 'wp-ultimate-post-grid' ),
+                    'nofollow' => __( 'Add the rel="nofollow" attribute', 'wp-ultimate-post-grid' ),
+                );
+
+                foreach( $custom_link_nofollow_options as $custom_link_nofollow => $custom_link_nofollow_name ) {
+                    $selected = $custom_link_nofollow == get_post_meta( $post->ID, 'wpupg_custom_link_nofollow', true ) ? ' selected="selected"' : '';
+                    echo '<option value="' . esc_attr( $custom_link_nofollow ) . '"' . $selected . '>' . $custom_link_nofollow_name . '</option>';
+                }
+                ?>
+            </select>
+        </td>
+        <td><?php _e( 'Override the link nofollow attribute for this item.', 'wp-ultimate-post-grid' ); ?></td>
     </tr>
     <tr>
         <td><label for="wpupg_custom_image"><?php _e( 'Custom Image URL', 'wp-ultimate-post-grid' ); ?></label></td>

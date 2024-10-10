@@ -49,6 +49,16 @@ function Sidebar( props ) {
                             ]}
                             onChange={ ( value ) => props.onChangeMeta( { wpupg_custom_link_behaviour: [value] } ) }
                         />
+                        <SelectControl
+                            label={ __( 'Custom Link Nofollow' ) }
+                            value={ props.linkNofollow }
+                            options={[
+                                { value: 'default', label: __( 'Use default from settings' ) },
+                                { value: 'dofollow', label: __( 'Use a regular dofollow link' ) },
+                                { value: 'nofollow', label: __( 'Add the rel="nofollow" attribute' ) },
+                            ]}
+                            onChange={ ( value ) => props.onChangeMeta( { wpupg_custom_link_nofollow: [value] } ) }
+                        />
                     </PanelBody>
                     <PanelBody title={ __( 'Custom Grid Image' ) }>
                         <TextControl
@@ -106,6 +116,9 @@ const applyWithSelect = withSelect( ( select, ownProps ) => {
     const linkBehaviourMeta = meta[ 'wpupg_custom_link_behaviour' ];
     const linkBehaviour = linkBehaviourMeta instanceof Array ? linkBehaviourMeta[0] : linkBehaviourMeta;
 
+    const linkNofollowMeta = meta[ 'wpupg_custom_link_nofollow' ];
+    const linkNofollow = linkNofollowMeta instanceof Array ? linkNofollowMeta[0] : linkNofollowMeta;
+
     const imageMeta = meta[ 'wpupg_custom_image' ];
     const image = imageMeta instanceof Array ? imageMeta[0] : imageMeta;
 
@@ -116,6 +129,7 @@ const applyWithSelect = withSelect( ( select, ownProps ) => {
         meta,
         link,
         linkBehaviour,
+        linkNofollow,
         image,
         imageId,
     }

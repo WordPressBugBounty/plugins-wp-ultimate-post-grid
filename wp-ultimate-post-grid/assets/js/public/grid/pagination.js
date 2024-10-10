@@ -35,6 +35,11 @@ export default ( elemId, args ) => {
                 args.filters = filterArgs;
             }
 
+            // Get current sort order.
+            if ( ! this.usingDefaultOrder() ) {
+                args.currentOrder = this.order;
+            }
+
             // Add to load items queue.
             this.loadItemsQueue.push({
                 args,

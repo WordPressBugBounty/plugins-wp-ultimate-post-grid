@@ -16,6 +16,7 @@ export default ( elemId, args ) => {
     return {
         filters,
         filtersRelation: args.filters_relation,
+        filtersNoSelection: args.filters_no_selection,
         getFilterString( withoutPagination = false ) {
             let selectors = [];
 
@@ -90,6 +91,7 @@ export default ( elemId, args ) => {
                 this.isotope.arrange({
                     filter: filterString,
                 });
+                this.maybeHideItems();
             }
         },
         initFilters() {
@@ -98,7 +100,20 @@ export default ( elemId, args ) => {
                     filter.init();
                 }
             }
-        }
+
+            // Check what the initial state of the grid should be.
+            this.maybeHideItems( true );
+        },
+        maybeHideItems( firstLoad = false ) {
+            if ( 'empty' === this.filtersNoSelection || ( firstLoad && 'empty_on_load' === this.filtersNoSelection ) ) {
+                if ( '' === this.getFilterString( true ) ) {
+                    if ( wpupg_public.debugging ) { console.log( 'WPUPG Filter - No filter selection', this.filtersNoSelection ); }
+                    this.isotope.arrange({
+                        filter: '.wpupg-hide-items-when-no-filter-selection',
+                    });
+                }
+            }
+        },
     }
 };
 

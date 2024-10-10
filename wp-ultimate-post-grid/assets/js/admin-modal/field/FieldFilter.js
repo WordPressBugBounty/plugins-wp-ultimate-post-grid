@@ -36,7 +36,8 @@ const FieldFilter = (props) => {
                     },{
                         label: __wpupg( 'Other' ),
                         options: [
-                            // { value: 'dynamic_order', label: `${ __wpupg( 'Dynamic Order' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                            { value: 'dynamic_order', label: `${ __wpupg( 'Dynamic Order' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                            { value: 'custom_html', label: `${ __wpupg( 'Custom HTML' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
                             { value: 'clear', label: __wpupg( 'Clear Filter Selections Button' ) },
                         ],
                     },

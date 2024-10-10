@@ -148,6 +148,27 @@ const ButtonStyle = (props) => {
                 ]}
                 label={ __wpupg( 'Alignment' ) }
             />
+            {
+                props.hasOwnProperty( 'hasIcon' )
+                && props.hasIcon
+                &&
+                <Field
+                    value={ style.icon_position }
+                    onChange={ ( value ) => { props.onChange({ icon_position: value }); }}
+                    type="dropdown"
+                    options={[
+                        {
+                            value: 'before',
+                            label: __wpupg( 'Before Text' ),
+                        },
+                        {
+                            value: 'after',
+                            label: __wpupg( 'After Text' ),
+                        },
+                    ]}
+                    label={ __wpupg( 'Icon Position' ) }
+                />
+            }
         </Fragment>
     );
 }
