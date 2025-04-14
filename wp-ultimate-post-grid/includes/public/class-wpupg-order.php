@@ -103,7 +103,7 @@ class WPUPG_Order {
 				$order_key = $item->count();
 				break;
 			case 'rand':
-				$order_key = rand();
+				$order_key = microtime();
 				break;
 			case 'menu_order':
 				$order_key = $item->menu_order();

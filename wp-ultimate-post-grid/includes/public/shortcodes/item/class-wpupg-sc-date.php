@@ -56,7 +56,7 @@ class WPUPG_SC_Date extends WPUPG_Template_Shortcode {
 			'date_format' => array(
 				'default' => 'F j, Y',
 				'type' => 'text',
-				'help' => __( 'Use the PHP date format. Leave empty to use default WordPress date format from the Settings > General page.', 'wp-ultimate-post-grid' ),
+				'help' => 'Use the PHP date format. Leave empty to use default WordPress date format from the Settings > General page.',
 			),
 		);
 		$atts = array_merge( $atts, WPUPG_Template_Helper::get_label_container_atts() );

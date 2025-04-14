@@ -21,26 +21,30 @@ class WPUPG_Settings {
 	private static $bvs;
 
 	/**
-	 * Register actions and filters.
+	 * Get the settings instance.
 	 *
 	 * @since    3.0.0
 	 */
-	public static function init() {
-		require_once WPUPG_DIR . 'templates/settings/settings.php';
-		require_once WPUPG_DIR . 'vendor/bv-settings/bv-settings.php';
+	public static function get_instance() {
+		if ( is_null( self::$bvs ) ) {
+			require_once WPUPG_DIR . 'templates/settings/settings.php';
+			require_once WPUPG_DIR . 'vendor/bv-settings/bv-settings.php';
 
-		self::$bvs = new BV_Settings(
-			array(
-				'uid'           	=> 'wpupg',
-				'menu_parent'   	=> 'wpultimatepostgrid',
-				'menu_title'    	=> __( 'Settings', 'wp-ultimate-post-grid' ),
-				'menu_priority' 	=> 20,
-				'settings'      	=> $settings_structure,
-				'required_addons' 	=> array(),
-			)
-		);
+			self::$bvs = new BV_Settings(
+				array(
+					'uid'           	=> 'wpupg',
+					'menu_parent'   	=> 'wpultimatepostgrid',
+					'menu_title'    	=> __( 'Settings', 'wp-ultimate-post-grid' ),
+					'menu_priority' 	=> 20,
+					'settings'      	=> $settings_structure,
+					'required_addons' 	=> array(),
+				)
+			);
 
-		add_filter( 'wpupg_settings_required_addons', array( __CLASS__, 'required_addons' ) );
+			add_filter( 'wpupg_settings_required_addons', array( __CLASS__, 'required_addons' ) );
+		}
+
+		return self::$bvs;
 	}
 
 	/**
@@ -66,7 +70,7 @@ class WPUPG_Settings {
 	 * @param    mixed $setting Setting to get the value for.
 	 */
 	public static function get( $setting ) {
-		return self::$bvs->get( $setting );
+		return self::get_instance()->get( $setting );
 	}
 
 	/**
@@ -76,8 +80,6 @@ class WPUPG_Settings {
 	 * @param    array $settings_to_update Settings to update.
 	 */
 	public static function update_settings( $settings_to_update ) {
-		return self::$bvs->update_settings( $settings_to_update );
+		return self::get_instance()->update_settings( $settings_to_update );
 	}
 }
-
-WPUPG_Settings::init();

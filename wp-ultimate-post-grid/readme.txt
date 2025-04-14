@@ -3,8 +3,8 @@ Contributors: BrechtVds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QG7KZMGFU325Y
 Tags: grid, isotope, filter, custom post type
 Requires at least: 3.5
-Tested up to: 6.6
-Stable tag: 4.0.0
+Tested up to: 6.8
+Stable tag: 4.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,11 @@ Check out the [WP Ultimate Post Grid demo site](https://bootstrapped.ventures/wp
 5. Different free templates that are fully responsive and work on desktop, tablet and mobile
 
 == Changelog ==
+= 4.0.1 =
+* Improvement: WordPress 6.8 compatibility
+* Fix: Random order inconsistent when using pagination
+* Fix: Loading translations too early
+
 = 4.0.0 =
 * Feature: Option to have an empty grid when no filter selections have been made
 * Feature: Set nofollow attribute for custom links
@@ -371,6 +376,9 @@ Check out the [WP Ultimate Post Grid demo site](https://bootstrapped.ventures/wp
 * Very first version of this plugin
 
 == Upgrade notice ==
+= 4.0.1 =
+Update to ensure compatibility with WordPress 6.8
+
 = 4.0.0 =
 Some great new features and improvements
 

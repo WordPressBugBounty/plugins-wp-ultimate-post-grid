@@ -75,8 +75,8 @@ class WPUPG_SC_Terms extends WPUPG_Template_Shortcode {
 				'default' => 'text',
 				'type' => 'dropdown',
 				'options' => array(
-					'text' => __( 'Text', 'wp-ultimate-post-grid' ),
-					'block' => __( 'Block', 'wp-ultimate-post-grid' ),
+					'text' => 'Text',
+					'block' => 'Block',
 				),
 			),
 			'block_horizontal_padding' => array(
