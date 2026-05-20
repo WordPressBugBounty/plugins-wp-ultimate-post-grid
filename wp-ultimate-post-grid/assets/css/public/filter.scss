@@ -39,6 +39,23 @@
         display: inline-block;
         cursor: pointer;
     }
+
+    .wpupg-filter-isotope-term {
+        position: relative;
+
+        &.wpupg-spinner {
+            min-width: 0;
+            min-height: 0;
+        }
+
+        &.wpupg-spinner:before {
+            width: var( --wpupg-isotope-spinner-size, 12px );
+            height: var( --wpupg-isotope-spinner-size, 12px );
+            margin-top: calc( var( --wpupg-isotope-spinner-size, 12px ) / -2 );
+            margin-left: calc( var( --wpupg-isotope-spinner-size, 12px ) / -2 );
+            border-top-color: var( --wpupg-isotope-spinner-color, #ccc );
+        }
+    }
 }
 
 .wpupg-filter-item-icon-container {

@@ -66,6 +66,7 @@ const General = (props) => {
                                             });
                                         }}
                                         type="filter"
+                                        grid={ props.grid }
                                         label={ `${__wpupg( 'Filter' )} #${ index + 1 }` }
                                         onClickUp={
                                             0 === index

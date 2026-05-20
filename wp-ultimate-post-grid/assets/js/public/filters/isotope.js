@@ -103,6 +103,72 @@ window.WPUPG_Filter_isotope = {
                 // Set selections.
                 this.selected = {};
             },
+            startButtonLoader( button ) {
+                if ( button.classList.contains( 'wpupg-spinner' ) ) {
+                    return;
+                }
+
+                const buttonRect = button.getBoundingClientRect();
+                const buttonStyle = window.getComputedStyle( button );
+                const spinnerColor = buttonStyle.getPropertyValue( 'color' );
+
+                button.wpupgLoaderStyles = {
+                    color: button.style.color,
+                    width: button.style.width,
+                    height: button.style.height,
+                    minWidth: button.style.minWidth,
+                    minHeight: button.style.minHeight,
+                    boxSizing: button.style.boxSizing,
+                    spinnerSize: button.style.getPropertyValue( '--wpupg-isotope-spinner-size' ),
+                    spinnerColor: button.style.getPropertyValue( '--wpupg-isotope-spinner-color' ),
+                };
+
+                // Keep dimensions fixed while text is hidden behind the spinner.
+                const smallestSide = Math.min( buttonRect.width, buttonRect.height );
+                const spinnerSize = Math.max( 8, Math.min( 14, Math.floor( smallestSide * 0.5 ) ) );
+
+                button.style.width = `${ buttonRect.width }px`;
+                button.style.height = `${ buttonRect.height }px`;
+                button.style.minWidth = `${ buttonRect.width }px`;
+                button.style.minHeight = `${ buttonRect.height }px`;
+                button.style.boxSizing = 'border-box';
+                button.style.color = 'transparent';
+                button.style.setProperty( '--wpupg-isotope-spinner-size', `${ spinnerSize }px` );
+                button.style.setProperty( '--wpupg-isotope-spinner-color', spinnerColor );
+                button.classList.add( 'wpupg-spinner' );
+            },
+            stopButtonLoader( button ) {
+                const previousStyles = button.wpupgLoaderStyles ? button.wpupgLoaderStyles : {};
+
+                button.classList.remove( 'wpupg-spinner' );
+                button.style.color = previousStyles.color ? previousStyles.color : '';
+                button.style.width = previousStyles.width ? previousStyles.width : '';
+                button.style.height = previousStyles.height ? previousStyles.height : '';
+                button.style.minWidth = previousStyles.minWidth ? previousStyles.minWidth : '';
+                button.style.minHeight = previousStyles.minHeight ? previousStyles.minHeight : '';
+                button.style.boxSizing = previousStyles.boxSizing ? previousStyles.boxSizing : '';
+
+                if ( previousStyles.spinnerSize ) {
+                    button.style.setProperty( '--wpupg-isotope-spinner-size', previousStyles.spinnerSize );
+                } else {
+                    button.style.removeProperty( '--wpupg-isotope-spinner-size' );
+                }
+
+                if ( previousStyles.spinnerColor ) {
+                    button.style.setProperty( '--wpupg-isotope-spinner-color', previousStyles.spinnerColor );
+                } else {
+                    button.style.removeProperty( '--wpupg-isotope-spinner-color' );
+                }
+
+                if ( button.wpupgLoaderStyles ) {
+                    delete button.wpupgLoaderStyles;
+                }
+            },
+            clearButtonLoaders() {
+                for ( let button of this.buttons ) {
+                    this.stopButtonLoader( button );
+                }
+            },
             buttonAll: false,
             onClickButton( button, forceActive = false, callback = false ) {
                 let clickedAllButton = button === this.buttonAll;
@@ -187,7 +253,24 @@ window.WPUPG_Filter_isotope = {
                 if ( clickedAllButton ) {
                     WPUPG_Grids[ this.gridElemId ].filter();
                 } else {
-                    WPUPG_Grids[ this.gridElemId ].maybeLoadItemsAndFilter();
+                    const showLoadingIndicator = this.args.term_loading_indicator ? true : false;
+                    let requestFinished = false;
+
+                    if ( showLoadingIndicator ) {
+                        this.clearButtonLoaders();
+                    }
+
+                    WPUPG_Grids[ this.gridElemId ].maybeLoadItemsAndFilter( {}, () => {
+                        requestFinished = true;
+
+                        if ( showLoadingIndicator ) {
+                            this.stopButtonLoader( button );
+                        }
+                    } );
+
+                    if ( showLoadingIndicator && ! requestFinished ) {
+                        this.startButtonLoader( button );
+                    }
                 }
 
                 if ( false !== callback ) {

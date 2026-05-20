@@ -135,7 +135,7 @@ class WPUPG_Assets {
 	 */
 	public static function block_assets() {
 		wp_enqueue_style( 'wpupg-blocks', WPUPG_URL . 'dist/blocks.css', array(), WPUPG_VERSION, 'all' );
-		wp_enqueue_script( 'wpupg-blocks', WPUPG_URL . 'dist/blocks.js', array( 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-edit-post', 'wp-components', 'wp-format-library'  ), WPUPG_VERSION );
+		wp_enqueue_script( 'wpupg-blocks', WPUPG_URL . 'dist/blocks.js', array( 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-editor', 'wp-edit-post', 'wp-components', 'wp-format-library'  ), WPUPG_VERSION );
 	}
 
 	/**

@@ -8,11 +8,17 @@ const SettingRichTextarea = (props) => {
     return (
         <ReactQuill
             className="bvs-setting-input"
+            theme="snow"
             value={props.value}
             onChange={(content, delta, source) => {
                 if('<p></p>' === content || '<p><br></p>' === content || '<p><br/></p>' === content) {
                     content = '';
                 }
+
+                if ('string' === typeof content) {
+                    content = content.replace(/\s*spellcheck="false"/gi, '');
+                }
+
                 props.onValueChange(content);
             }}
             modules={{

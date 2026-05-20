@@ -48,6 +48,7 @@ class WPUPG_Filter_Isotope {
 			'match_parents' => false,
 			'inverse' => false,
 			'show_empty' => false,
+			'term_loading_indicator' => false,
 			'count' => false,
 			'multiselect' => false,
 			'multiselect_type' => 'match_all',
@@ -100,6 +101,7 @@ class WPUPG_Filter_Isotope {
 			if ( isset( $options['match_parents'] ) ) { $sanitized_options['match_parents'] = $options['match_parents'] ? true : false; }
 			if ( isset( $options['multiselect'] ) ) { $sanitized_options['multiselect'] = $options['multiselect'] ? true : false; }
 			if ( isset( $options['show_empty'] ) ) { $sanitized_options['show_empty'] = $options['show_empty'] ? true : false; }
+			if ( isset( $options['term_loading_indicator'] ) ) { $sanitized_options['term_loading_indicator'] = $options['term_loading_indicator'] ? true : false; }
 
 			// Custom Field.
 			if ( isset( $options['custom_field'] ) ) { $sanitized_options['custom_field'] = sanitize_key( $options['custom_field'] ); }
@@ -219,6 +221,7 @@ class WPUPG_Filter_Isotope {
 			$args['match_parents'] = $filter['options']['match_parents'];
 			$args['multiselect'] = $filter['options']['multiselect'];
 			$args['multiselect_type'] = $filter['options']['multiselect_type'];
+			$args['term_loading_indicator'] = $filter['options']['term_loading_indicator'];
 		}
 
 		return $args;

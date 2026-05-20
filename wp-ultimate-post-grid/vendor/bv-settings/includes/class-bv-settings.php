@@ -1,143 +1,145 @@
 <?php
 /**
- * The core component class.
+ * Stable public wrapper for the active BV Settings implementation.
  *
  * @link       https://bootstrapped.ventures
- * @since      1.0.0
+ * @since      1.1.0
  *
  * @package    BV_Settings
  */
 
-/**
- * The core component class.
- *
- * @since      1.0.0
- * @package    BV_Settings
- * @author     Brecht Vandersmissen <brecht@bootstrapped.ventures>
- */
-class BV_Settings {
-    public $atts;
-    public $helpers;
-
+if ( ! class_exists( 'BV_Settings' ) ) {
 	/**
-	 * Make sure all is set up for the component to load.
+	 * Stable public wrapper for the active BV Settings implementation.
 	 *
-	 * @since   1.0.0
+	 * @since 1.1.0
 	 */
-	public function __construct( $atts = array() ) {
-        // Set defaults.
-        $atts = shortcode_atts( array(
-            'uid' => '',
-            'menu_priority' => 10,
-            'menu_title' => __( 'Settings', 'bv-settings' ),
-            'menu_parent' => 'options-general.php',
-            'page_title' => __( 'Settings', 'bv-settings' ),
-            'page_slug' => false,
-            'required_capability' => 'manage_options',
-            'settings' => array(),
-            'required_addons' => array(),
-        ), $atts );
+	class BV_Settings {
+		public $atts;
+		public $helpers;
+		public $component;
 
-        // Make sure required fields are set.
-        $atts['uid'] = sanitize_title( $atts['uid'] );
-        if ( ! $atts['uid'] ) {
-            throw new Exception( 'You need to initialize the settings with a UID.' );
-        }
+		/**
+		 * Active implementation instance.
+		 *
+		 * @since 1.1.0
+		 * @var object
+		 */
+		private $implementation;
 
-        // Calculated defaults.
-        if ( ! $atts['page_slug'] ) {
-            $atts['page_slug'] = 'bv_settings_' . $atts['uid'];
-        }
-        
-        // Save attributes and load helpers.
-        $this->atts = $atts;
-		$this->load_helpers();
-	}
+		/**
+		 * Resolve and instantiate the active component implementation.
+		 *
+		 * @since   1.1.0
+		 * @param   array $atts Component attributes.
+		 */
+		public function __construct( $atts = array() ) {
+			$component = bv_settings_get_active_component();
 
-	/**
-	 * Load helper classes.
-	 *
-	 * @since   1.0.0
-	 */
-	private function load_helpers() {
-        require_once( BVS_DIR . 'includes/class-bvs-api.php' );
-        $this->helpers['api'] = new BV_API( $this );
+			if ( ! $component ) {
+				throw new Exception( 'No BV Settings component is registered.' );
+			}
 
-        require_once( BVS_DIR . 'includes/class-bvs-menu.php' );
-        $this->helpers['menu'] = new BV_Menu( $this );
+			if ( ! class_exists( $component['class'] ) ) {
+				require_once $component['loader'];
+			}
 
-        require_once( BVS_DIR . 'includes/class-bvs-saver.php' );
-        $this->helpers['saver'] = new BV_Saver( $this );
+			if ( ! class_exists( $component['class'] ) ) {
+				throw new Exception( 'The active BV Settings implementation could not be loaded.' );
+			}
 
-        require_once( BVS_DIR . 'includes/class-bvs-structure.php' );
-        $this->helpers['structure'] = new BV_Structure( $this );
-    }
+			$class                = $component['class'];
+			$this->implementation = new $class( $atts, $component );
+			$this->atts           = &$this->implementation->atts;
+			$this->helpers        = &$this->implementation->helpers;
+			$this->component      = &$this->implementation->component;
+		}
 
-    /**
-	 * Get the settings structure.
-	 *
-	 * @since   1.0.0
-	 * @param   mixed $resolve_callbacks Wether to resolve the callbacks.
-	 */
-	public function get_structure( $resolve_callbacks = false ) {
-		return $this->helpers['structure']->get_structure( $resolve_callbacks );
-	}
-    
-    /**
-	 * Get the value for a specific setting.
-	 *
-	 * @since   1.0.0
-	 * @param   mixed $setting Setting to get the value for.
-	 */
-	public function get( $setting ) {
-		return $this->helpers['structure']->get( $setting );
-    }
-    
-    /**
-	 * Get all the settings.
-	 *
-	 * @since   1.0.0
-	 */
-	public function get_settings() {
-		return $this->helpers['structure']->get_settings();
-    }
+		/**
+		 * Forward unknown method calls to the active implementation.
+		 *
+		 * @since   1.1.0
+		 * @param   string $name      Method name.
+		 * @param   array  $arguments Method arguments.
+		 * @return  mixed
+		 */
+		public function __call( $name, $arguments ) {
+			return call_user_func_array( array( $this->implementation, $name ), $arguments );
+		}
 
-    /**
-	 * Get all the settings with defaults if not set.
-	 *
-	 * @since   1.0.0
-	 */
-	public function get_settings_with_defaults() {
-		return $this->helpers['structure']->get_settings_with_defaults();
-	}
-    
-    /**
-	 * Get the default for a specific setting.
-	 *
-	 * @since   1.0.0
-	 * @param   mixed $setting Setting to get the default for.
-	 */
-	public function get_default( $setting ) {
-		return $this->helpers['structure']->get_default( $setting );
-    }
-    
-	/**
-	 * Get the default settings.
-	 *
-	 * @since   1.0.0
-	 * @param	boolean $force_update Wether to force an update of the cache.
-	 */
-	public function get_defaults( $force_update = false ) {
-		return $this->helpers['structure']->get_defaults( $force_update );
-    }
-    
-    /**
-	 * Update the settings.
-	 *
-	 * @since	1.0.0
-	 * @param	array $settings_to_update Settings to update.
-	 */
-	public function update_settings( $settings_to_update ) {
-		return $this->helpers['saver']->update_settings( $settings_to_update );
+		/**
+		 * Get the settings structure.
+		 *
+		 * @since   1.0.0
+		 * @param   mixed $resolve_callbacks Whether to resolve the callbacks.
+		 * @return  array
+		 */
+		public function get_structure( $resolve_callbacks = false ) {
+			return $this->implementation->get_structure( $resolve_callbacks );
+		}
+
+		/**
+		 * Get the value for a specific setting.
+		 *
+		 * @since   1.0.0
+		 * @param   mixed $setting Setting to get the value for.
+		 * @return  mixed
+		 */
+		public function get( $setting ) {
+			return $this->implementation->get( $setting );
+		}
+
+		/**
+		 * Get all settings.
+		 *
+		 * @since   1.0.0
+		 * @return  array
+		 */
+		public function get_settings() {
+			return $this->implementation->get_settings();
+		}
+
+		/**
+		 * Get all settings with defaults if not set.
+		 *
+		 * @since   1.0.0
+		 * @return  array
+		 */
+		public function get_settings_with_defaults() {
+			return $this->implementation->get_settings_with_defaults();
+		}
+
+		/**
+		 * Get the default for a specific setting.
+		 *
+		 * @since   1.0.0
+		 * @param   mixed $setting Setting to get the default for.
+		 * @return  mixed
+		 */
+		public function get_default( $setting ) {
+			return $this->implementation->get_default( $setting );
+		}
+
+		/**
+		 * Get all defaults.
+		 *
+		 * @since   1.0.0
+		 * @param   boolean $force_update Whether to force a cache refresh.
+		 * @return  array
+		 */
+		public function get_defaults( $force_update = false ) {
+			return $this->implementation->get_defaults( $force_update );
+		}
+
+		/**
+		 * Update settings.
+		 *
+		 * @since   1.0.0
+		 * @param   array $settings_to_update Settings to update.
+		 * @return  array
+		 */
+		public function update_settings( $settings_to_update ) {
+			return $this->implementation->update_settings( $settings_to_update );
+		}
 	}
 }

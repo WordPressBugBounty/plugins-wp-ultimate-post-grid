@@ -62,6 +62,7 @@ class WPUPG_Blocks {
 	public static function register_blocks() {
 		if ( function_exists( 'register_block_type' ) ) {
 			$block_settings = array(
+				'api_version' => 3,
 				'attributes' => array(
 					'id' => array(
 						'type' => 'string',

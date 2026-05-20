@@ -3,7 +3,7 @@
         margin-bottom: 10px;
     }
 
-    .CodeMirror {
+    .cm-editor {
         height: 200px;
         border: 1px solid #ddd;
     }
@@ -15,4 +15,19 @@
 
 textarea.bvs-setting-input {
     width: 100%;
+    line-height: 2;
+    min-height: 30px;
+}
+
+.bvs-setting-object-table {
+    width: 100%;
+
+    th {
+        text-align: left;
+    }
+
+    input,
+    textarea {
+        width: 95%;
+    }
 }

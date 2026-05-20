@@ -7,6 +7,9 @@ const SettingNumber = (props) => {
             <input
                 className="bvs-setting-input"
                 type="number"
+                min={ props.setting.hasOwnProperty('min') ? props.setting.min : undefined }
+                max={ props.setting.hasOwnProperty('max') ? props.setting.max : undefined }
+                step={ props.setting.hasOwnProperty('step') ? props.setting.step : undefined }
                 value={props.value}
                 onChange={(e) => props.onValueChange(e.target.value)}
             />

@@ -123,6 +123,13 @@ const FilterIsotope = (props) => {
                                         help={ __wpupg( "Show terms that don't have any posts." ) }
                                     />
                                     <Field
+                                        value={ options.term_loading_indicator }
+                                        onChange={ ( value ) => { props.onChange({ term_loading_indicator: value }); }}
+                                        type="checkbox"
+                                        label={ __wpupg( 'Show Loader' ) }
+                                        help={ __wpupg( 'Show a loader on the selected term button while waiting for server responses.' ) }
+                                    />
+                                    <Field
                                         value={ options.count }
                                         onChange={ ( value ) => { props.onChange({ count: value }); }}
                                         type="checkbox"
@@ -210,6 +217,13 @@ const FilterIsotope = (props) => {
                                         type="checkbox"
                                         label={ __wpupg( 'Inverse Selection' ) }
                                         help={ __wpupg( 'Items that match the selection will be hidden.' ) }
+                                    />
+                                    <Field
+                                        value={ options.term_loading_indicator }
+                                        onChange={ ( value ) => { props.onChange({ term_loading_indicator: value }); }}
+                                        type="checkbox"
+                                        label={ __wpupg( 'Show Loader' ) }
+                                        help={ __wpupg( 'Show a loader on the selected term button while waiting for server responses.' ) }
                                     />
                                     <Field
                                         value={ options.multiselect }

@@ -33,6 +33,7 @@ const SettingsContainer = (props) => {
                             onSettingChange={props.onSettingChange}
                             settingsChanged={props.settingsChanged}
                             group={group}
+                            searchQuery={props.searchQuery}
                             key={i}
                         />
                     }
@@ -42,6 +43,7 @@ const SettingsContainer = (props) => {
                             settings={props.settings}
                             onResetDefaults={props.onResetDefaults}
                             group={group}
+                            searchQuery={props.searchQuery}
                             key={i}
                         />
                     }
@@ -58,6 +60,7 @@ SettingsContainer.propTypes = {
     settingsChanged: PropTypes.bool.isRequired,
     onSettingChange: PropTypes.func.isRequired,
     onResetDefaults: PropTypes.func.isRequired,
+    searchQuery: PropTypes.string.isRequired,
 }
 
 export default SettingsContainer;

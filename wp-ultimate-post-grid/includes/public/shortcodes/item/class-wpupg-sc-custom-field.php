@@ -32,6 +32,10 @@ class WPUPG_SC_Custom_Field extends WPUPG_Template_Shortcode {
 				'type' => 'dropdown',
 				'options' => array(
 					'text' => 'Text',
+					'url' => 'URL',
+					'email' => 'Email',
+					'phone' => 'Phone Number',
+					'address' => 'Address',
 					'acf_date' => 'ACF - Date',
 					'acf_image' => 'ACF - Image',
 					'acf_link' => 'ACF - Link',
@@ -131,7 +135,27 @@ class WPUPG_SC_Custom_Field extends WPUPG_Template_Shortcode {
 		if ( 'text' === $atts['type'] ) {
 			$custom_field = WPUPG_Template_Helper::limit_text( $atts, $custom_field );
 		} else {
-			$custom_field = self::parse_acf( $custom_field, $atts );
+			if ( 'url' === $atts['type'] ) {
+				$custom_field = trim( $custom_field );
+
+				if ( filter_var( $custom_field, FILTER_VALIDATE_URL ) ) {
+					$custom_field = '<a href="' . esc_url( $custom_field ) . '" target="_blank">' . esc_html( $custom_field ) . '</a>';
+				}
+			} else if ( 'email' === $atts['type'] ) {
+				$custom_field = trim( $custom_field );
+
+				if ( filter_var( $custom_field, FILTER_VALIDATE_EMAIL ) ) {
+					$custom_field = '<a href="mailto:' . esc_attr( $custom_field ) . '">' . esc_html( $custom_field ) . '</a>';
+				}
+			} else if ( 'phone' === $atts['type'] ) {
+				$custom_field = trim( $custom_field );
+				$custom_field = '<a href="tel:' . esc_attr( $custom_field ) . '">' . esc_html( $custom_field ) . '</a>';
+			} else if ( 'address' === $atts['type'] ) {
+				$custom_field = trim( $custom_field );
+				$custom_field = '<a href="https://maps.google.com/?q=' . esc_attr( $custom_field ) . '" target="_blank">' . esc_html( $custom_field ) . '</a>';
+			} else {
+				$custom_field = self::parse_acf( $custom_field, $atts );
+			}
 		}
 
 		// Allow filtering in code.

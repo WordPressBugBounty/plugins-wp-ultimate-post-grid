@@ -1,24 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Helpers from '../general/Helpers';
 import RequiredLabel from './RequiredLabel';
 import Settings from './Settings';
 
 const SettingsSubGroup = (props) => {
     return (
-        <div className="bvs-settings-subgroup">
-            <h3 className="bvs-settings-subgroup-name"><RequiredLabel object={props.subgroup}/>{props.subgroup.name}</h3>
+        <div
+            id={Helpers.getSubgroupAnchor(props.group, props.subgroup, props.subgroupIndex)}
+            className="bvs-settings-subgroup"
+        >
+            <h3 className="bvs-settings-subgroup-name">
+                <RequiredLabel object={props.subgroup}/>
+                {props.subgroup.name && (props.searchQuery ? Helpers.highlightText(props.subgroup.name, props.searchQuery) : props.subgroup.name)}
+            </h3>
             {
                 props.subgroup.hasOwnProperty('description')
                 ?
-                <div className="bvs-settings-subgroup-description">{props.subgroup.description}</div>
+                <div className="bvs-settings-subgroup-description">
+                    {props.searchQuery ? Helpers.highlightText(props.subgroup.description, props.searchQuery) : props.subgroup.description}
+                </div>
                 :
                 null
             }
             {
                 props.subgroup.hasOwnProperty('documentation')
                 ?
-                <a href={props.subgroup.documentation} target="_blank" className="bvs-setting-documentation">Learn More</a>
+                <a href={props.subgroup.documentation} target="_blank" className="bvs-setting-documentation">{ props.subgroup.hasOwnProperty('documentation_text') ? props.subgroup.documentation_text : 'Learn More' }</a>
                 :
                 null
             }
@@ -30,6 +39,7 @@ const SettingsSubGroup = (props) => {
                     settings={props.settings}
                     onSettingChange={props.onSettingChange}
                     settingsChanged={props.settingsChanged}
+                    searchQuery={props.searchQuery}
                 />
                 :
                 null
@@ -39,10 +49,13 @@ const SettingsSubGroup = (props) => {
 }
 
 SettingsSubGroup.propTypes = {
+    group: PropTypes.object.isRequired,
     subgroup: PropTypes.object.isRequired,
+    subgroupIndex: PropTypes.number.isRequired,
     settings: PropTypes.object.isRequired,
     onSettingChange: PropTypes.func.isRequired,
     settingsChanged: PropTypes.bool.isRequired,
+    searchQuery: PropTypes.string.isRequired,
 }
 
 export default SettingsSubGroup;

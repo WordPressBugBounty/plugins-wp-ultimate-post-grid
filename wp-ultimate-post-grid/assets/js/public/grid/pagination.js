@@ -14,8 +14,36 @@ export default ( elemId, args ) => {
     return {
         pagination,
         dynamicRules: args.hasOwnProperty( 'dynamic_rules' ) ? args.dynamic_rules : [],
+        runtimePayload: args.hasOwnProperty( 'runtime_payload' ) ? args.runtime_payload : {},
         itemIds: args.hasOwnProperty( 'item_ids' ) ? args.item_ids : [],
         totalIds: args.hasOwnProperty( 'total_ids' ) ? args.total_ids : false,
+        setRuntimePayload( payload = {} ) {
+            this.runtimePayload = {
+                ...this.runtimePayload,
+                ...payload,
+            };
+        },
+        resetItems() {
+            this.itemIds = [];
+            this.totalIds = false;
+
+            const itemElements = this.isotope.getItemElements();
+            if ( itemElements.length ) {
+                this.isotope.remove( itemElements );
+                this.layout();
+            }
+        },
+        reloadItems( args = {}, callback = false ) {
+            if ( this.pagination && this.pagination.hasOwnProperty( 'page' ) && ! args.hasOwnProperty( 'page' ) && 0 < this.pagination.page ) {
+                args.page = this.pagination.page;
+            }
+
+            this.resetItems();
+            this.loadItems({
+                ...args,
+                type: 'load',
+            }, callback );
+        },
         loadItems( args, callback = false ) {
             // Make sure type is set.
             args.type = args.hasOwnProperty( 'type' ) ? args.type : 'load';
@@ -81,6 +109,7 @@ export default ( elemId, args ) => {
 
             // Add dynamic rules.
             args.dynamic_rules = this.dynamicRules;
+            args.runtime_payload = args.hasOwnProperty( 'runtime_payload' ) ? args.runtime_payload : this.runtimePayload;
 
             // Get new items through API.
             const body = {
@@ -91,6 +120,9 @@ export default ( elemId, args ) => {
             if ( wpupg_public.debugging ) { console.log( 'WPUPG Load Items - body', body ); }
             return Api.loadItems( body ).then((data) => {
                 if ( wpupg_public.debugging ) { console.log( 'WPUPG Load Items - data', data ); }
+                if ( data && data.hasOwnProperty( 'count_total' ) ) {
+                    this.totalIds = data.count_total;
+                }
                 if ( data && data.items && data.items.hasOwnProperty( 'ids' ) ) {
                     const newIds = Array.isArray( data.items.ids ) ? data.items.ids : Object.values( data.items.ids );
                     this.itemIds = this.itemIds.concat( newIds );

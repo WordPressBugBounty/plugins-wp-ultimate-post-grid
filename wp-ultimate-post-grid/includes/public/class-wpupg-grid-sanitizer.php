@@ -199,11 +199,17 @@ class WPUPG_Grid_Sanitizer {
 			$sanitized_rules = array();
 
 			foreach ( $grid['limit_rules'] as $limit_rule ) {
-				$sanitized_rules[] = array(
+				$sanitized_rule = array(
 					'field' => sanitize_text_field( $limit_rule['field'] ),
 					'values' => array_map( 'sanitize_text_field', $limit_rule['values'] ),
 					'type' => sanitize_key( $limit_rule['type'] ),
 				);
+
+				if ( isset( $limit_rule['order_mode'] ) && in_array( $limit_rule['order_mode'], array( 'grid_order', 'favorite_order' ), true ) ) {
+					$sanitized_rule['order_mode'] = $limit_rule['order_mode'];
+				}
+
+				$sanitized_rules[] = $sanitized_rule;
 			}
 
 			$sanitized_grid['limit_rules'] = $sanitized_rules;

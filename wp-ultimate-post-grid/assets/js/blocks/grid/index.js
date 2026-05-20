@@ -15,9 +15,11 @@ const { Fragment } = wp.element;
 // Backwards compatibility.
 let InspectorControls;
 let BlockControls;
+let useBlockProps = ( props = {} ) => props;
 if ( wp.hasOwnProperty( 'blockEditor' ) ) {
 	InspectorControls = wp.blockEditor.InspectorControls;
 	BlockControls = wp.blockEditor.BlockControls;
+	useBlockProps = wp.blockEditor.useBlockProps || useBlockProps;
 } else {
 	InspectorControls = wp.editor.InspectorControls;
 	BlockControls = wp.editor.BlockControls;
@@ -33,6 +35,7 @@ if ( wp.hasOwnProperty( 'serverSideRender' ) ) {
 import '../../../css/blocks/grid.scss';
 
 registerBlockType( 'wp-ultimate-post-grid/grid', {
+    apiVersion: 3,
     title: __( 'Grid' ),
     description: __( 'Display a WP Ultimate Post Grid.' ),
     icon: 'grid-view',
@@ -68,6 +71,7 @@ registerBlockType( 'wp-ultimate-post-grid/grid', {
     },
     edit: (props) => {
         const { attributes, setAttributes, className } = props;
+        const blockProps = useBlockProps( { className } );
 
         const insertGridModal = () => {
             WPUPG_Modal.open( 'select', {
@@ -87,7 +91,7 @@ registerBlockType( 'wp-ultimate-post-grid/grid', {
         }
         
         return (
-            <div className={ className }>{
+            <div { ...blockProps }>{
                 attributes.id
                 ?
                 <Fragment>

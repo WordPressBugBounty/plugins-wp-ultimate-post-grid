@@ -1,7 +1,10 @@
 const { __ } = wp.i18n;
 
 const { Fragment } = wp.element;
-const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
+const editorSlots = wp.editor || {};
+const editPostSlots = wp.editPost || {};
+const PluginSidebar = editorSlots.PluginSidebar || editPostSlots.PluginSidebar;
+const PluginSidebarMoreMenuItem = editorSlots.PluginSidebarMoreMenuItem || editPostSlots.PluginSidebarMoreMenuItem;
 const { compose } = wp.compose;
 const { withSelect, withDispatch } = wp.data;
 const { Panel, PanelBody, Button, withFocusReturn, TextControl, SelectControl } = wp.components;

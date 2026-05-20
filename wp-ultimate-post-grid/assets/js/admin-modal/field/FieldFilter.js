@@ -1,4 +1,5 @@
 import React from 'react';
+const { hooks } = WPUltimatePostGrid['wp-ultimate-post-grid/dist/shared'];
 
 import Icon from 'Shared/Icon';
 import { __wpupg } from 'Shared/Translations';
@@ -6,6 +7,26 @@ import FieldDropdown from './FieldDropdown';
 import FieldSlug from './FieldSlug';
  
 const FieldFilter = (props) => {
+    const optionGroups = hooks.applyFilters( 'filterTypeOptions', [
+        {
+            label: __wpupg( 'Filters' ),
+            options: [
+                { value: 'isotope', label: __wpupg( 'Isotope' ) },
+                { value: 'checkboxes', label: `${ __wpupg( 'Checkboxes' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                // { value: 'slider', label: `${ __wpupg( 'Slider' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                { value: 'dropdown', label: `${ __wpupg( 'Dropdown' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                { value: 'text_search', label: `${ __wpupg( 'Text Search' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+            ],
+        },{
+            label: __wpupg( 'Other' ),
+            options: [
+                { value: 'dynamic_order', label: `${ __wpupg( 'Dynamic Order' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                { value: 'custom_html', label: `${ __wpupg( 'Custom HTML' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
+                { value: 'clear', label: __wpupg( 'Clear Filter Selections Button' ) },
+            ],
+        },
+    ], props );
+
     return (
         <div className="wpupg-admin-modal-field-filter">
             <FieldDropdown
@@ -23,25 +44,7 @@ const FieldFilter = (props) => {
                         type: value,
                     });
                 } }
-                options={[
-                    {
-                        label: __wpupg( 'Filters' ),
-                        options: [
-                            { value: 'isotope', label: __wpupg( 'Isotope' ) },
-                            { value: 'checkboxes', label: `${ __wpupg( 'Checkboxes' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
-                            // { value: 'slider', label: `${ __wpupg( 'Slider' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
-                            { value: 'dropdown', label: `${ __wpupg( 'Dropdown' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
-                            { value: 'text_search', label: `${ __wpupg( 'Text Search' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
-                        ],
-                    },{
-                        label: __wpupg( 'Other' ),
-                        options: [
-                            { value: 'dynamic_order', label: `${ __wpupg( 'Dynamic Order' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
-                            { value: 'custom_html', label: `${ __wpupg( 'Custom HTML' ) }${ wpupg_admin.addons.premium ? '' : ` (${__wpupg( 'Premium Only' ) })` }`, },
-                            { value: 'clear', label: __wpupg( 'Clear Filter Selections Button' ) },
-                        ],
-                    },
-                ]}
+                options={ optionGroups }
                 width="215px"
             />
             <input

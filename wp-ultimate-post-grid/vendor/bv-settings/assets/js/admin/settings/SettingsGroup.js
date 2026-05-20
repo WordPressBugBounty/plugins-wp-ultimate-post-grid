@@ -10,18 +10,22 @@ const SettingsGroup = (props) => {
     return (
         <div id={`bvs-settings-group-${props.group.id}`} className="bvs-settings-group">
             <RequiredLabel object={props.group}/>
-            <h2 className="bvs-settings-group-name">{props.group.name}</h2>
+            <h2 className="bvs-settings-group-name">
+                {props.searchQuery ? Helpers.highlightText(props.group.name, props.searchQuery) : props.group.name}
+            </h2>
             {
                 props.group.hasOwnProperty('description')
                 ?
-                <div className="bvs-settings-group-description">{props.group.description}</div>
+                <div className="bvs-settings-group-description">
+                    {props.searchQuery ? Helpers.highlightText(props.group.description, props.searchQuery) : props.group.description}
+                </div>
                 :
                 null
             }
             {
                 props.group.hasOwnProperty('documentation')
                 ?
-                <a href={props.group.documentation} target="_blank" className="bvs-setting-documentation">Learn More</a>
+                <a href={props.group.documentation} target="_blank" className="bvs-setting-documentation">{ props.group.hasOwnProperty('documentation_text') ? props.group.documentation_text : 'Learn More' }</a>
                 :
                 null
             }
@@ -33,6 +37,7 @@ const SettingsGroup = (props) => {
                     settings={props.settings}
                     onSettingChange={props.onSettingChange}
                     settingsChanged={props.settingsChanged}
+                    searchQuery={props.searchQuery}
                 />
                 :
                 null
@@ -46,10 +51,13 @@ const SettingsGroup = (props) => {
                     }
                     
                     return <SettingsSubGroup
+                        group={props.group}
+                        subgroupIndex={i}
                         settings={props.settings}
                         onSettingChange={props.onSettingChange}
                         settingsChanged={props.settingsChanged}
                         subgroup={subgroup}
+                        searchQuery={props.searchQuery}
                         key={i}
                     />
                 })
@@ -65,6 +73,7 @@ SettingsGroup.propTypes = {
     settings: PropTypes.object.isRequired,
     settingsChanged: PropTypes.bool.isRequired,
     onSettingChange: PropTypes.func.isRequired,
+    searchQuery: PropTypes.string.isRequired,
 }
 
 export default SettingsGroup;

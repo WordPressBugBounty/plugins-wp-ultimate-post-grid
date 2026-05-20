@@ -31,6 +31,59 @@ window.WPUPG_Pagination_pages = {
                 this.pagesLoaded[ orderKey ].push( page );
             },
             totalPages: false,
+            bindButtons() {
+                this.buttons = this.elem.querySelectorAll( '.wpupg-pagination-term' );
+
+                for ( let button of this.buttons ) {
+                    button.addEventListener( 'click', (e) => {
+                        if ( e.which === 1 ) { // Left mouse click.
+                            this.onClickButton( button );
+                        }
+                    } );
+                    button.addEventListener( 'keydown', (e) => {
+                        if ( e.which === 13 || e.which === 32 ) { // Space or ENTER.
+                            this.onClickButton( button );
+                        }
+                    } );
+                }
+            },
+            refreshButtons( totalPosts = false ) {
+                if ( ! this.elem ) {
+                    return;
+                }
+
+                if ( false === totalPosts ) {
+                    totalPosts = WPUPG_Grids[ this.gridElemId ].totalIds;
+                }
+
+                totalPosts = parseInt( totalPosts );
+
+                if ( ! totalPosts || totalPosts <= this.args.posts_per_page ) {
+                    this.totalPages = 0;
+                    this.buttons = [];
+                    this.elem.innerHTML = '';
+                    return;
+                }
+
+                const activePage = this.page < Math.ceil( totalPosts / this.args.posts_per_page ) ? this.page : 0;
+                const totalPages = Math.ceil( totalPosts / this.args.posts_per_page );
+
+                if ( this.totalPages !== totalPages || ! this.buttons || this.buttons.length !== totalPages ) {
+                    let html = '';
+
+                    for ( let page = 0; page < totalPages; page++ ) {
+                        const active = page === activePage ? ' active' : '';
+                        html += `<div class="wpupg-pagination-term wpupg-page-${ page }${ active }" data-page="${ page }" role="button" tabindex="0">${ page + 1 }</div>`;
+                    }
+
+                    this.elem.innerHTML = html;
+                    this.totalPages = totalPages;
+                    this.page = activePage;
+                    this.bindButtons();
+                }
+
+                this.contractPages();
+            },
             getDeeplink() {
                 return this.page ? `p:${ this.page }` : '';
             },
@@ -326,54 +379,44 @@ window.WPUPG_Pagination_pages = {
                 // Set first page loaded for default order.
                 this.setPageLoaded( 0 );
 
-                if ( this.buttons && 0 < this.buttons.length ) {
-                    this.contractPages();
+                this.refreshButtons();
 
-                    WPUPG_Grids[ pagination.gridElemId ].on( 'filter', () => {
-                        this.adaptPages();
-                    });
+                WPUPG_Grids[ pagination.gridElemId ].on( 'filter', () => {
+                    this.adaptPages();
+                });
 
-                    WPUPG_Grids[ pagination.gridElemId ].on( 'sort', () => {
-                        if ( this.args.adaptive_pages ) {
-                            // Load at least 1 page of items.
-                            WPUPG_Grids[ this.gridElemId ].loadItems(
-                                {
-                                    page: 0,
-                                }, () => {
-                                    this.setPageLoaded( 0 );
+                WPUPG_Grids[ pagination.gridElemId ].on( 'sort', () => {
+                    if ( this.args.adaptive_pages && this.buttons && 0 < this.buttons.length ) {
+                        // Load at least 1 page of items.
+                        WPUPG_Grids[ this.gridElemId ].loadItems(
+                            {
+                                page: 0,
+                            }, () => {
+                                this.setPageLoaded( 0 );
 
-                                    this.currentFilterString = 'force';
-                                    this.adaptPages();
+                                this.currentFilterString = 'force';
+                                this.adaptPages();
 
-                                    // Force a first button click.
-                                    const firstButton = this.buttons[0];
-                                    firstButton.classList.remove( 'active' );
-                                    this.onClickButton( firstButton );
-                                }
-                            );
-                        }
-                    });
-                }
+                                // Force a first button click.
+                                const firstButton = this.buttons[0];
+                                firstButton.classList.remove( 'active' );
+                                this.onClickButton( firstButton );
+                            }
+                        );
+                    }
+                });
+
+                WPUPG_Grids[ this.gridElemId ].on( 'itemsLoaded', ( data ) => {
+                    if ( data && data.hasOwnProperty( 'count_total' ) ) {
+                        this.refreshButtons( data.count_total );
+                    }
+                } );
             },
         }
 
         if ( elem ) {
-            pagination.buttons = elem.querySelectorAll( '.wpupg-pagination-term' );
+            pagination.bindButtons();
             pagination.totalPages = pagination.buttons.length;
-
-            // Add event listeners.
-            for ( let button of pagination.buttons ) {
-                button.addEventListener( 'click', (e) => {
-                    if ( e.which === 1 ) { // Left mouse click.
-                        pagination.onClickButton( button );
-                    }
-                } );
-                button.addEventListener( 'keydown', (e) => {
-                    if ( e.which === 13 || e.which === 32 ) { // Space or ENTER.
-                        pagination.onClickButton( button );
-                    }
-                } );
-            }
         }
 
         return pagination;

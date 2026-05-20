@@ -23,6 +23,7 @@ const Settings = (props) => {
                                 settingsChanged={props.settingsChanged}
                                 onSettingChange={props.onSettingChange}
                                 value={props.settings[setting.id]}
+                                searchQuery={props.searchQuery}
                                 key={i}
                             />
                         </ErrorBoundary>
@@ -38,6 +39,7 @@ Settings.propTypes = {
     outputSettings: PropTypes.array.isRequired,
     onSettingChange: PropTypes.func.isRequired,
     settingsChanged: PropTypes.bool.isRequired,
+    searchQuery: PropTypes.string.isRequired,
 }
 
 export default Settings;
