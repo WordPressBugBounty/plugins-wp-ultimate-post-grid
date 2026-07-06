@@ -11,6 +11,7 @@ window.WPUPG_Pagination_pages = {
             id,
             elem,
             page: 0,
+            buttons: [],
             pagesLoaded: {},
             checkPageLoaded( page ) {
                 const orderKey = WPUPG_Grids[ pagination.gridElemId ].getOrderKey();
@@ -131,11 +132,11 @@ window.WPUPG_Pagination_pages = {
                     }
 
                     // Load page.
-                    this.changePage( button, ( page ) => {
+                    this.changePage( button, ( page, loadedItems = false ) => {
                         this.page = page;
 
                         // Trigger grid filter.
-                        WPUPG_Grids[ pagination.gridElemId ].filter();
+                        WPUPG_Grids[ pagination.gridElemId ].filter( loadedItems );
 
                         // Optional callback.
                         if ( false !== callback ) {
@@ -148,7 +149,7 @@ window.WPUPG_Pagination_pages = {
                 const page = parseInt( button.dataset.page );
 
                 if ( this.checkPageLoaded( page ) || ( this.args.adaptive_pages && '.wpupg-item' !== this.currentFilterString ) ) {
-                    callback( page );
+                    callback( page, false );
                     this.contractPages();
                 } else {
                     // Set Loading state for button.
@@ -171,8 +172,10 @@ window.WPUPG_Pagination_pages = {
                             this.adaptPageClasses(); // Need to update page classes if new items have been loaded. Do before callback, where the grid gets filtered.
                         }
 
+                        WPUPG_Grids[ pagination.gridElemId ].filter( true );
+
                         if ( false !== callback ) {
-                            callback( page );
+                            callback( page, true );
                         }
                         this.contractPages();
                     })
@@ -407,8 +410,23 @@ window.WPUPG_Pagination_pages = {
                 });
 
                 WPUPG_Grids[ this.gridElemId ].on( 'itemsLoaded', ( data ) => {
-                    if ( data && data.hasOwnProperty( 'count_total' ) ) {
+                    const grid = WPUPG_Grids[ this.gridElemId ];
+                    const meta = grid.getLoadMeta( data );
+
+                    if ( meta.stale ) {
+                        return;
+                    }
+
+                    const isAdaptiveFilterLoad = this.args.adaptive_pages && 'load_all' === meta.type && meta.hasFilters;
+
+                    if ( grid.canUseResponseTotal( data ) ) {
                         this.refreshButtons( data.count_total );
+                    }
+
+                    if ( isAdaptiveFilterLoad ) {
+                        this.currentFilterString = 'force';
+                        this.adaptPages();
+                        grid.filter( true );
                     }
                 } );
             },

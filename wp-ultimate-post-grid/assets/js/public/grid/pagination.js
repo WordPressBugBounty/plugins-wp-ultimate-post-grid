@@ -33,6 +33,53 @@ export default ( elemId, args ) => {
                 this.layout();
             }
         },
+        getLoadMeta( data ) {
+            const request = data && data.hasOwnProperty( 'request' ) ? data.request : {};
+
+            return {
+                hasFilters: !! ( request && request.has_filters ),
+                hasLoadedIds: !! ( request && request.has_loaded_ids ),
+                type: request && request.hasOwnProperty( 'type' ) ? request.type : false,
+                stale: !! ( request && request.stale ),
+            };
+        },
+        canUseResponseTotal( data ) {
+            if ( ! data || ! data.hasOwnProperty( 'count_total' ) ) {
+                return false;
+            }
+
+            const meta = this.getLoadMeta( data );
+            return ! meta.hasFilters && ! meta.hasLoadedIds;
+        },
+        requestLoadedAllRemaining( data ) {
+            if ( ! data || ! data.hasOwnProperty( 'count' ) ) {
+                return false;
+            }
+
+            if ( 0 >= parseInt( data.count ) ) {
+                return true;
+            }
+
+            if ( data.hasOwnProperty( 'count_loaded' ) && data.hasOwnProperty( 'count_total' ) ) {
+                const countLoaded = parseInt( data.count_loaded );
+                const countTotal = parseInt( data.count_total );
+
+                return ! isNaN( countLoaded ) && ! isNaN( countTotal ) && countLoaded >= countTotal;
+            }
+
+            return false;
+        },
+        getLoadedCountForCurrentFilter( data = false ) {
+            if ( data && data.hasOwnProperty( 'searchIds' ) && data.searchIds ) {
+                const searchIds = Array.isArray( data.searchIds ) ? data.searchIds : Object.values( data.searchIds );
+                const loadedIds = new Set( this.itemIds.map( ( id ) => id.toString() ) );
+
+                return searchIds.filter( ( id ) => loadedIds.has( id.toString() ) ).length;
+            }
+
+            const filterString = this.getFilterString();
+            return filterString ? this.elem.querySelectorAll( filterString ).length : this.itemIds.length;
+        },
         reloadItems( args = {}, callback = false ) {
             if ( this.pagination && this.pagination.hasOwnProperty( 'page' ) && ! args.hasOwnProperty( 'page' ) && 0 < this.pagination.page ) {
                 args.page = this.pagination.page;
@@ -120,13 +167,42 @@ export default ( elemId, args ) => {
             if ( wpupg_public.debugging ) { console.log( 'WPUPG Load Items - body', body ); }
             return Api.loadItems( body ).then((data) => {
                 if ( wpupg_public.debugging ) { console.log( 'WPUPG Load Items - data', data ); }
-                if ( data && data.hasOwnProperty( 'count_total' ) ) {
+                const hasActiveFilters = args.hasOwnProperty( 'filters' ) && 0 < args.filters.length;
+                const hasLoadedIds = args.hasOwnProperty( 'loaded_ids' ) && 0 < args.loaded_ids.length;
+                let searchText = false;
+
+                if ( hasActiveFilters ) {
+                    for ( let filter of args.filters ) {
+                        if ( 'search' === filter.type ) {
+                            searchText = filter.text;
+                            break;
+                        }
+                    }
+                }
+
+                if ( data ) {
+                    data.request = {
+                        has_filters: hasActiveFilters,
+                        has_loaded_ids: hasLoadedIds,
+                        search_text: searchText,
+                        stale: false,
+                        type: args.type,
+                    };
+                }
+
+                if ( this.canUseResponseTotal( data ) ) {
                     this.totalIds = data.count_total;
                 }
                 if ( data && data.items && data.items.hasOwnProperty( 'ids' ) ) {
                     const newIds = Array.isArray( data.items.ids ) ? data.items.ids : Object.values( data.items.ids );
                     this.itemIds = this.itemIds.concat( newIds );
                     this.insertItems( data.items.html );
+                }
+
+                for ( let filter of this.filters ) {
+                    if ( filter.hasOwnProperty( 'updateItemsLoadedData' ) ) {
+                        filter.updateItemsLoadedData( data );
+                    }
                 }
 
                 this.fireEvent( 'itemsLoaded', data );
@@ -137,6 +213,20 @@ export default ( elemId, args ) => {
             });
         },
         loadOnFilter: args.pagination.hasOwnProperty( 'load_on_filter' ) ? args.pagination.load_on_filter : false,
+        maybeLoadItemsAndFilterCurrentSelection( args = {}, callback = false ) {
+            const hasActiveFilters = '' !== this.getFilterString( true );
+            const hasRequestedFilters = args.hasOwnProperty( 'filters' ) && 0 < args.filters.length;
+
+            if ( hasActiveFilters || hasRequestedFilters ) {
+                this.maybeLoadItemsAndFilter( args, callback );
+            } else {
+                this.filter();
+
+                if ( false !== callback ) {
+                    callback( false );
+                }
+            }
+        },
         maybeLoadItemsAndFilter( args = {}, callback = false ) {
             // Check if args includes search filter.
             let hasSearchFilter = false;

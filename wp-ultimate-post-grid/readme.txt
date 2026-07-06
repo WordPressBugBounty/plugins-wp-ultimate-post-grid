@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: grid, isotope, filter, custom post type
 Requires at least: 3.5
 Tested up to: 7.0
-Stable tag: 4.1.0
+Stable tag: 4.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,11 @@ Check out the [WP Ultimate Post Grid demo site](https://bootstrapped.ventures/wp
 5. Different free templates that are fully responsive and work on desktop, tablet and mobile
 
 == Changelog ==
+= 4.1.1 =
+* Improvement: Ability to include children when taking over archive page
+* Fix: Adapative pages not filtering correctly in some cases
+* Fix: Potential JS error when using pages pagination without enough items
+
 = 4.1.0 =
 * Feature: Show Loader option for isotope filter
 * Improvement: Extra custom field display options
@@ -382,6 +387,9 @@ Check out the [WP Ultimate Post Grid demo site](https://bootstrapped.ventures/wp
 * Very first version of this plugin
 
 == Upgrade notice ==
+= 4.1.1 =
+Prevent issues in some edge cases
+
 = 4.1.0 =
 Some great new features and improvements
 

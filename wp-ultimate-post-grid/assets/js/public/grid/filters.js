@@ -31,11 +31,8 @@ export default ( elemId, args ) => {
                 const filterSelectors = filter.getSelectors();
 
                 if ( filterSelectors ) {
-                    // Combine pagination selector as it should always be applied.
-                    filterSelectors = filterSelectors.map((selector) => paginationSelector + selector);
-
                     if ( 'OR' === this.filtersRelation ) {
-                        selectors.push( filterSelectors.join( ', ' ) );
+                        selectors = selectors.concat( filterSelectors );
                     } else {
                         selectors.push( filterSelectors );
                     }
@@ -44,12 +41,16 @@ export default ( elemId, args ) => {
             
             let filterString = '';
             if ( 0 < selectors.length ) {
+                let filterSelectors = [];
+
                 if ( 'OR' === this.filtersRelation ) {
-                    filterString = selectors.join( ', ' );
+                    filterSelectors = selectors;
                 } else {
-                    const combinations = make_combinations( selectors ).map( (a) => a.join( '' ) );
-                    filterString = combinations.join( ', ' );
+                    filterSelectors = make_combinations( selectors ).map( (a) => a.join( '' ) );
                 }
+
+                // Combine pagination selector as it should always be applied, but only once per selector.
+                filterString = filterSelectors.map((selector) => paginationSelector + selector).join( ', ' );
             }
 
             // If there was no filter, make sure pagination is still applied.
@@ -78,20 +79,42 @@ export default ( elemId, args ) => {
             this.filterPaused = false;
             this.filter();
         },
-        filter() {
+        filter( instant = false ) {
             this.fireEvent( 'filter' );
 
             if ( ! this.filterPaused ) {
                 const filterString = this.getFilterString();
+                const transitionDuration = this.isotope.options.transitionDuration;
     
                 // Temporarily hide empty message (gets checked after arrange);
                 this.hideEmpty( true );
     
                 if ( wpupg_public.debugging ) { console.log( 'WPUPG Filter - filterString', filterString ); }
-                this.isotope.arrange({
-                    filter: filterString,
-                });
-                this.maybeHideItems();
+
+                if ( instant ) {
+                    this.isotope.options.transitionDuration = 0;
+                }
+
+                try {
+                    this.isotope.arrange({
+                        filter: filterString,
+                    });
+                    this.maybeHideItems();
+
+                    if ( instant ) {
+                        const filteredItemElements = new Set( this.isotope.getFilteredItemElements() );
+
+                        for ( let item of this.isotope.getItemElements() ) {
+                            if ( ! filteredItemElements.has( item ) ) {
+                                item.style.display = 'none';
+                            }
+                        }
+                    }
+                } finally {
+                    if ( instant ) {
+                        this.isotope.options.transitionDuration = transitionDuration;
+                    }
+                }
             }
         },
         initFilters() {

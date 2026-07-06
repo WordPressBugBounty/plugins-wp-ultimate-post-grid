@@ -61,8 +61,10 @@ class WPUPG_Migrations {
 			$filter_defaults = WPUPG_Filter::get_defaults();
 
 			$filter_style = $grid->unserialize( $grid->meta( 'filter_style', array() ) );
+			$filter_style = is_array( $filter_style ) ? $filter_style : array();
+			$isotope_style = isset( $filter_style['isotope'] ) && is_array( $filter_style['isotope'] ) ? $filter_style['isotope'] : array();
 	
-			$options = array_replace_recursive( $filter_defaults['isotope'], array(
+			$migrated_options = array(
 				'taxonomies' => $grid->unserialize( $grid->meta( 'filter_taxonomies', array() ) ),
 				'match_parents' => $grid->meta( 'filter_match_parents', false ),
 				'inverse' => $grid->meta( 'filter_inverse', false ),
@@ -73,10 +75,21 @@ class WPUPG_Migrations {
 				'limit' => $grid->meta( 'filter_limit', false ),
 				'limit_exclude' => $grid->meta( 'filter_limit_exclude', false ),
 				'limit_terms' => $grid->unserialize( $grid->meta( 'filter_limit_terms', array() ) ),
-				'all_button_text' => $filter_style['isotope']['all_button_text'],
-				'term_order' => $filter_style['isotope']['term_order'],
-				'style' => $filter_style['isotope'],
-			) );
+			);
+
+			if ( isset( $isotope_style['all_button_text'] ) ) {
+				$migrated_options['all_button_text'] = $isotope_style['all_button_text'];
+			}
+
+			if ( isset( $isotope_style['term_order'] ) ) {
+				$migrated_options['term_order'] = $isotope_style['term_order'];
+			}
+
+			if ( $isotope_style ) {
+				$migrated_options['style'] = $isotope_style;
+			}
+
+			$options = array_replace_recursive( $filter_defaults['isotope'], $migrated_options );
 
 			$filters[] = array(
 				'id' => '',

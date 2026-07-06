@@ -251,7 +251,7 @@ window.WPUPG_Filter_isotope = {
     
                 // Trigger grid filter.
                 if ( clickedAllButton ) {
-                    WPUPG_Grids[ this.gridElemId ].filter();
+                    WPUPG_Grids[ this.gridElemId ].maybeLoadItemsAndFilterCurrentSelection();
                 } else {
                     const showLoadingIndicator = this.args.term_loading_indicator ? true : false;
                     let requestFinished = false;

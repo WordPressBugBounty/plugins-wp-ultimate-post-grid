@@ -44,7 +44,7 @@ class WPUPG_Shortcode_Takeover {
 					$out = self::takeover_query( $out );
 					break;
 				case 'archive':
-					$out = self::takeover_archive( $out );
+					$out = self::takeover_archive( $out, $atts );
 					break;
 				case 'search':
 					$out = self::takeover_search( $out );
@@ -79,16 +79,42 @@ class WPUPG_Shortcode_Takeover {
 	 * Takeover an archive page.
 	 *
 	 * @since    3.8.0
-     * @param 	array  $atts The shortcode attributes.
+     * @param 	array  $atts     The shortcode attributes.
+     * @param 	array  $raw_atts The raw shortcode attributes.
 	 */
-	public static function takeover_archive( $atts ) {
+	public static function takeover_archive( $atts, $raw_atts = array() ) {
 		$term = get_queried_object();
 
 		if ( $term && 'WP_Term' === get_class( $term ) ) {
-			$atts[ $term->taxonomy ] = $term->term_id;
+			if ( self::archive_include_children( $raw_atts ) && is_taxonomy_hierarchical( $term->taxonomy ) ) {
+				$term_ids = array( intval( $term->term_id ) );
+				$children = get_term_children( $term->term_id, $term->taxonomy );
+
+				if ( ! is_wp_error( $children ) ) {
+					$term_ids = array_merge( $term_ids, array_map( 'intval', $children ) );
+				}
+
+				$atts[ $term->taxonomy ] = implode( ';', array_unique( array_filter( $term_ids ) ) );
+			} else {
+				$atts[ $term->taxonomy ] = $term->term_id;
+			}
 		}
 		
 		return $atts;
+	}
+
+	/**
+	 * Check whether archive takeover should include child terms.
+	 *
+	 * @since    4.1.1
+     * @param 	array  $atts The raw shortcode attributes.
+	 */
+	public static function archive_include_children( $atts ) {
+		if ( ! isset( $atts['archive_include_children'] ) ) {
+			return false;
+		}
+
+		return filter_var( $atts['archive_include_children'], FILTER_VALIDATE_BOOLEAN );
 	}
 
 	/**
